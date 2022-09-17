@@ -1,0 +1,9 @@
+    def get(self,request, *args, **kwargs):
+        user_id = kwargs.get('user_id')
+        print(user_id)
+        user = User.objects.get(id=user_id)
+        profile = Profile.objects.get(user=user)
+        context = {
+            "profile": profile
+        }
+        return render(request, "updateprofile.html", context)

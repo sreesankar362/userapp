@@ -1,0 +1,189 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <!-- CSS only -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous"><!-- JavaScript Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+<!-- javascript -->
+    <script src="{% static 'main.js' %}" ></script>
+<!--    jquery-->
+    <script
+  src="https://code.jquery.com/jquery-3.6.1.js"
+  integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI="
+  crossorigin="anonymous"></script>
+<!--    fontawesome -->
+        <script crossorigin="anonymous" src="https://kit.fontawesome.com/79756cfe25.js"></script>
+
+<!--styles-->
+    <style>
+        #id_post{
+        height:100px;
+        }
+    </style>
+</head>
+<body style="background-color:aliceblue;">
+<!--navbar-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary ">
+  <a class="navbar-brand" href="{% url 'home' %}"> Home</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+        {% if request.user.users.bio %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'updateprofile' user.id %}">Update Profile</a>
+          </li>
+
+        {% else %}
+           <li class="nav-text">
+            <a class="nav-link" href="{% url 'addprofile' %}">Add Profile</a>
+          </li>
+        {%endif%}
+
+      <li class="nav-text">
+        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+      </li>
+
+    </ul>
+  </div>
+</nav>
+
+<!--container-->
+<div class="container">
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6 ">
+        {% include "messages.html" %}
+            <div id="alert-box"></div>
+            <div class="card mt-5"><!--newpost start-->
+                <div class="card-body">
+                     <form id="post-form" >
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                         <div style="float:right">
+                             <button style="width:100px;" type="submit" class="btn btn-primary " >Publish</button>
+                         </div>
+                    </form>
+                </div>
+            </div><!--newpost end-->
+
+        <!--all posts list-->
+            {% for post in posts %}
+                   <div class="card mt-3 mb-3">
+                        <div class="card-body">
+                                <div style="float: left">
+                                {% if post.author.users.profile_pic %}
+                                     <img
+                                            src="{{post.author.users.profile_pic.url}}"
+                                            alt="..."
+                                            class="img-thumbnail"
+                                            style="width: max; height: 50px; border-radius: 50%; border: none"
+                                    />
+                                    {% else %}
+                                    <img
+                                            src="{% static 'images/user.png' %}"
+                                            alt="..."
+                                            class="img-thumbnail"
+                                            style="width: max; height: 50px; border-radius: 50%; border: none"
+                                    />
+                                    {% endif %}
+
+                                </div>
+
+
+                                <h6 class="card-title">{{ post.author}}</h6>
+
+                            <p style="line-height: 0.4em; font-size: small">
+                                {{post.posted_date}}
+                            </p>
+
+                            {% if request.user == post.author %}
+                            <li style="float:right;" type="none" class="nav-item dropdown ">
+                                <a class="nav-link dropdown-toggle" href="#" id="" role="button" data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'delete' post.id %}">Delete Post</a></li>
+
+
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                            <hr/>
+                            <h6 class="card-text">{{ post.post}}</h6>
+                        </div>
+                        <!--            like -->
+                          <div class="  p-2" >
+                                <div class="col-6  bg-light ">
+                                    <!-- ======like section====== -->
+                                    <div class=" text-primary d-flex justify-content-center ">
+
+                                        {%if request.user in post.liked_users %}
+                                        <p style="font-size:25px ;margin-top:3px;" class=" text-primary">{{ post.liked_users | length }} </p>
+                                        <a href="{% url 'unlike' post.id %}">
+                                            <i style="font-size:30px; margin-top: 10% ;"
+                                               class="ms-2 text-primary fa-solid fa-thumbs-up"></i>
+                                        </a>
+                                        {%else%}
+                                        <p style="font-size:25px ; margin-top:3px;" class=" text-secondary">{{ post.liked_users | length }} </p>
+                                        <a href="{% url 'like' post.id %}">
+                                            <i style="font-size:30px; margin-top: 10% ;"
+                                               class="ms-2 text-secondary fa-regular fa-thumbs-up"></i>
+                                        </a>
+
+                                        {%endif%}
+
+
+                                    </div>
+
+                                </div>
+                                <div>
+
+                                    <!-- =======comment section====== -->
+                                </div>
+
+                            </div><!--            like -->
+
+
+                   </div>
+
+            {% endfor %} <!--single post for-->
+
+
+
+        </div>
+        <div class="col-2"></div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript">
+console.log(document.getElementById("id_post"))
+    $(document).on('submit','#post-form',function(e){
+
+     $.ajax({
+        type: 'POST',
+        url: '{% url 'home' %}',
+        data:{
+            post:$('#id_post').val(),
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+        },
+        success:function(){
+            alert('saved');
+        }
+
+
+    });
+
+});
+
+</script>
+</html>
